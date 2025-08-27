@@ -70,10 +70,10 @@ DealSense AI employs a multi-agent architecture with specialized components:
 
 For detailed technical documentation, architecture deep-dives, and implementation guides, visit:
 
-- **[Models & AI Components](models.md)** - Fine-tuned LLaMA, XGBoost, RAG pipeline, and ensemble details
-- **[Features & Agents](features.md)** - Complete guide to all specialized agents and their capabilities  
-- **[Dataset & Curation](data.md)** - Data sourcing, filtering, sampling, and embedding processes
-- **[API Integration](api.md)** - Internal API usage, authentication, and service integrations
+- **[Models & AI Components](docs/models.md)** - Fine-tuned LLaMA, XGBoost, RAG pipeline, and ensemble details
+- **[Features & Agents](docs/features.md)** - Complete guide to all specialized agents and their capabilities  
+- **[Dataset & Curation](docs/data.md)** - Data sourcing, filtering, sampling, and embedding processes
+- **[API Integration](docs/api.md)** - Internal API usage, authentication, and service integrations
 
 ---
 
