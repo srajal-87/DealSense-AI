@@ -3,8 +3,8 @@
 DealSense AI training data was sourced, filtered, cleaned, embedded, and sampled at scale. This section documents the entire process.
 
 📓 Related Notebooks:
-* ⚙️ [Data Curation](cd..notebooks/data_curation.ipynb)
-* 📊 [Embeddings & ChromaDB](cd..notebooks/embeddings_xgb.ipynb)
+* ⚙️ [Data Curation](../notebooks/data_curation.ipynb)
+* 📊 [Embeddings & ChromaDB](../notebooks/embeddings_xgb.ipynb)
 
 ---
 

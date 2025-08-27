@@ -13,8 +13,8 @@ We fine-tuned a **`LLaMA 3.1 8B Quantized`** model using **`QLoRA`**  on a curat
 After fine-tuning and evaluation, the best-performing checkpoint was published to **Hugging Face Hub**.
 
 📓 Related Notebooks:
-* ⚙️ [Fine-Tuning QLoRA ](./notebooks/llama3_1_finetunning.ipynb)
-* 📊 [Evaluation Results ](./notebooks/evaluating_fineTune.ipynb)
+* ⚙️ [Fine-Tuning QLoRA ](../notebooks/llama3_1_finetunning.ipynb)
+* 📊 [Evaluation Results ](../notebooks/evaluating_fineTune.ipynb)
 
 
 ---
@@ -26,7 +26,7 @@ We reused the same curated dataset to generate embeddings using the **E5 model**
 Using these embeddings, we trained an **XGBoost regression model** with tuned hyperparameters to predict product prices from vectorized descriptions in the training dataset. The trained model (`xgboost_model.pkl`) was pushed to **Hugging Face Hub**.
 
 📓 Related Notebooks:
-* ⚙️ [Embeddings XGB ](./notebooks/embedding_xgb.ipynb)
+* ⚙️ [Embeddings XGB ](../notebooks/embedding_xgb.ipynb)
 
 
 
@@ -53,7 +53,7 @@ The model uses the raw predictions along with simple engineered features (e.g., 
 Once trained and evaluated, the ensemble model (`ensemble_model.pkl`) was pushed to Hugging Face Hub.
 
 📓 [Related Notebook]
-* ⚙️ [Ensemble Model ](./notebooks/ensemble_model.ipynb)
+* ⚙️ [Ensemble Model ](../notebooks/ensemble_model.ipynb)
 
 
 ---
