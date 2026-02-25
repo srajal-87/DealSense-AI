@@ -1,7 +1,6 @@
-import os
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+from pathlib import Path
 import joblib
 
 from src.agents.agent import Agent
@@ -9,11 +8,15 @@ from src.agents.specialist_agent import SpecialistAgent
 from src.agents.frontier_agent import FrontierAgent
 from src.agents.xgboost_agent import XGBoostPriceAgent
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+ENSEMBLE_MODEL_PATH = PROJECT_ROOT / "models" / "ensemble_model.pkl"
+
+
 class EnsembleAgent(Agent):
 
     name = "Ensemble Agent"
     color = Agent.YELLOW
-    
+
     def __init__(self, collection):
         """
         Create an instance of Ensemble, by creating each of the models
@@ -23,10 +26,7 @@ class EnsembleAgent(Agent):
         self.specialist = SpecialistAgent()
         self.frontier = FrontierAgent(collection)
         self.xgboost = XGBoostPriceAgent()
-
-        ## PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-        ## MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "ensemble_model.pkl")
-        self.model = joblib.load("models/ensemble_model.pkl")
+        self.model = joblib.load(str(ENSEMBLE_MODEL_PATH))
 
         self.log("Ensemble Agent is ready")
 

@@ -15,7 +15,7 @@ An intelligent agentic AI system that scans, evaluates, and discovers the best o
 
 ## 🚀 Tech Stack
 
-- **Languages & Frameworks**: Python, FastAPI, React
+- **Languages & Frameworks**: Python, FastAPI, React.js
 - **AI & Machine Learning**: 
   - OpenAI GPT for deal selection and RAG-based price prediction
   - Fine-tuned LLaMA 3.1 8B (QLoRA) for specialized price estimation
@@ -50,6 +50,11 @@ DealSense AI employs a multi-agent architecture with specialized components:
    MODAL_TOKEN_ID=your_modal_token_id
    MODAL_TOKEN_SECRET=your_modal_token_secret
    ```
+
+2. **Production / deployment**
+   - **Backend:** Set `ALLOWED_ORIGINS` to your frontend origin(s), comma-separated (e.g. `https://your-app.onrender.com`). Set `DEAL_THRESHOLD` (optional, default `50`) for minimum discount in dollars. Use `PORT` for the listen port (platforms set this automatically).
+   - **Frontend:** For production builds, set `REACT_APP_API_BASE` to the deployed API URL (e.g. `https://your-api.onrender.com`) so the app talks to the correct backend.
+   - **Graceful shutdown:** On SIGTERM the process exits; in-flight deal searches may not complete. Completed/error/cancelled jobs are pruned automatically (by count and age) so memory stays bounded.
 
 ## 📈 How It Works
 

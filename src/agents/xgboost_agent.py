@@ -1,8 +1,11 @@
-import os
-import numpy as np
+from pathlib import Path
 from sentence_transformers import SentenceTransformer
 import joblib
 from src.agents.agent import Agent
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+XGBOOST_MODEL_PATH = PROJECT_ROOT / "models" / "xgboost_model.pkl"
+
 
 class XGBoostPriceAgent(Agent):
 
@@ -18,11 +21,7 @@ class XGBoostPriceAgent(Agent):
         and the SentenceTransformer vector encoding model
         """
         self.log("XGBoost Agent is initializing")
-
-        # Load model path relative to project root
-        # PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-        # MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "xgboost_model.pkl")
-        self.model = joblib.load("models/xgboost_model.pkl")
+        self.model = joblib.load(str(XGBOOST_MODEL_PATH))
 
         self.vectorizer = self._vectorizer
         self.log("XGBoost Agent is ready")

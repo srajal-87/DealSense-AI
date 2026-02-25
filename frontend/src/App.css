@@ -1,4 +1,5 @@
 /* Direct Gradio theme replacement - Dark theme with same styling */
+/* Phase 1: Visual and layout polish */
 
 * {
   margin: 0;
@@ -12,6 +13,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', sans-serif;
   line-height: 1.6;
+  font-size: 16px;
 }
 
 .App {
@@ -23,45 +25,65 @@ body {
 .dealmind-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 24px;
   background-color: #0b0f19;
 }
 
-/* Header Section - matching Gradio gr.Markdown styling */
+/* Header Section - clearer type hierarchy */
 .header-section {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #1e2936;
 }
 
 .app-title {
-  font-size: 32px;
-  font-weight: bold;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.25;
   color: #ffffff;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
 .app-subtitle {
-  font-size: 18px;
-  color: #666;
-  margin-bottom: 20px;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: #94a3b8;
+  margin-bottom: 0;
 }
 
 .app-description {
-  font-size: 16px;
-  color: #ffffff;
-  margin-bottom: 20px;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #e2e8f0;
+  margin-bottom: 24px;
   text-align: left;
+  padding: 16px 20px;
+  background-color: #1a1f2e;
+  border-radius: 8px;
+  border-left: 3px solid #3b82f6;
 }
 
 .how-it-works {
   text-align: left;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
+  padding: 16px 20px;
+  background-color: #1a1f2e;
+  border-radius: 8px;
 }
 
 .how-it-works h3 {
-  font-size: 16px;
+  font-size: 1rem;
+  font-weight: 600;
   color: #ffffff;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.how-it-works p {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: #cbd5e1;
 }
 
 .demo-notice {
@@ -74,128 +96,163 @@ body {
 
 /* Category Selection - matching Gradio CheckboxGroup */
 .category-section {
-  margin: 30px 0;
-  background-color: #1a1a1a;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #333;
+  margin: 28px 0;
+  background-color: #1a1f2e;
+  padding: 24px;
+  border-radius: 10px;
+  border: 1px solid #334155;
 }
 
 .section-title {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 1rem;
+  font-weight: 600;
   color: #ffffff;
-  margin-bottom: 15px;
+  margin-bottom: 16px;
+  letter-spacing: 0.01em;
 }
 
 .checkbox-group {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 .checkbox-item {
   display: flex;
   align-items: center;
-  padding: 8px;
-  background-color: #2a2a2a;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  min-height: 44px;
+  padding: 10px 14px;
+  background-color: #252d3d;
+  border-radius: 6px;
+  transition: background-color 0.2s, border-color 0.2s;
+  border: 1px solid transparent;
 }
 
 .checkbox-item:hover {
-  background-color: #3a3a3a;
+  background-color: #2d3748;
+}
+
+.checkbox-item:focus-within {
+  border-color: #3b82f6;
+  outline: none;
 }
 
 .checkbox-item input {
-  margin-right: 10px;
+  margin-right: 12px;
   transform: scale(1.2);
+  cursor: pointer;
+}
+
+.checkbox-item input:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 .checkbox-item label {
-  color: #ffffff;
+  color: #e2e8f0;
   cursor: pointer;
   user-select: none;
+  font-size: 0.9375rem;
 }
 
 /* Find Deals Button - matching Gradio Button */
 .button-section {
   text-align: center;
-  margin: 30px 0;
+  margin: 32px 0;
 }
 
 .find-deals-btn {
-  background-color: #007bff;
+  background-color: #2563eb;
   color: white;
   border: none;
-  padding: 15px 40px;
-  font-size: 18px;
-  font-weight: bold;
+  padding: 14px 36px;
+  font-size: 1.0625rem;
+  font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.1s;
+  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
 }
 
-.find-deals-btn:hover {
-  background-color: #0056b3;
+.find-deals-btn:hover:not(:disabled) {
+  background-color: #1d4ed8;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.find-deals-btn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 .find-deals-btn:disabled {
-  background-color: #555;
+  background-color: #475569;
   cursor: not-allowed;
   transform: none;
 }
 
-/* Status Message */
+/* Status Message - clearer distinction with background strip */
 .status-message {
   text-align: center;
   margin: 20px 0;
-  font-size: 16px;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 12px 20px;
+  border-radius: 8px;
 }
 
 .status-message.error {
-  color: #f44336;
+  color: #fca5a5;
+  background-color: rgba(220, 38, 38, 0.15);
+  border: 1px solid rgba(220, 38, 38, 0.4);
 }
 
 .status-message.success {
-  color: #4caf50;
+  color: #86efac;
+  background-color: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
 }
 
 .status-message.warning {
-  color: #ff9800;
+  color: #fcd34d;
+  background-color: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.4);
 }
 
 /* Results Table - matching Gradio Dataframe */
 .results-section {
-  margin: 30px 0;
+  margin: 28px 0;
+}
+
+.results-table-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 420px;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  background-color: #1a1f2e;
 }
 
 .results-table {
   width: 100%;
+  min-width: 640px;
   border-collapse: collapse;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 8px;
-  overflow: hidden;
-  max-height: 400px;
-  display: block;
-  overflow-y: auto;
+  background-color: #1a1f2e;
 }
 
 .results-table thead {
-  background-color: #2a2a2a;
+  background-color: #252d3d;
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
 .results-table th {
-  padding: 12px;
+  padding: 14px 12px;
   text-align: left;
-  color: #ffffff;
-  font-weight: bold;
-  border-bottom: 2px solid #333;
+  color: #f1f5f9;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-bottom: 2px solid #334155;
 }
 
 .results-table tbody {
@@ -204,71 +261,83 @@ body {
 }
 
 .results-table td {
-  padding: 12px;
-  border-bottom: 1px solid #333;
-  color: #ffffff;
+  padding: 14px 12px;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
+  font-size: 0.9375rem;
+  vertical-align: top;
 }
 
-.results-table tr:hover {
-  background-color: #2a2a2a;
+.results-table tbody tr:hover {
+  background-color: #252d3d;
 }
 
 .results-table a {
-  background-color: #007bff;
+  background-color: #2563eb;
   color: white;
   padding: 8px 16px;
   text-decoration: none;
-  border-radius: 4px;
-  font-weight: bold;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
   display: inline-block;
+  transition: background-color 0.2s;
 }
 
 .results-table a:hover {
-  background-color: #0056b3;
+  background-color: #1d4ed8;
+}
+
+.results-table a:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 /* Empty state */
 .empty-results {
   text-align: center;
-  padding: 40px;
-  color: #666;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 8px;
+  padding: 48px 24px;
+  color: #94a3b8;
+  background-color: #1a1f2e;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
 }
 
 /* Logs Section - matching Gradio HTML output */
 .logs-section {
-  margin: 30px 0;
+  margin: 28px 0;
 }
 
 .logs-container {
   height: 400px;
   overflow-y: auto;
-  border: 1px solid #333;
-  background-color: #222229;
-  padding: 10px;
-  border-radius: 8px;
-  font-family: monospace;
-  font-size: 14px;
-  line-height: 1.4;
+  border: 1px solid #334155;
+  background-color: #1e2533;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .log-entry {
-  margin-bottom: 5px;
-  color: #ffffff;
+  margin-bottom: 6px;
+  color: #e2e8f0;
+  word-break: break-word;
 }
 
 .log-entry.info {
-  color: #4caf50;
+  color: #86efac;
 }
 
 .log-entry.warning {
-  color: #ff9800;
+  color: #fcd34d;
 }
 
 .log-entry.error {
-  color: #f44336;
+  color: #fca5a5;
 }
 
 /* Loading states */
@@ -276,17 +345,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
+  gap: 12px;
+  color: #94a3b8;
+  font-size: 0.9375rem;
 }
 
 .spinner {
-  border: 2px solid #333;
-  border-top: 2px solid #007bff;
+  border: 2px solid #334155;
+  border-top: 2px solid #3b82f6;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  animation: spin 1s linear infinite;
-  margin-right: 10px;
+  width: 22px;
+  height: 22px;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
 }
 
 @keyframes spin {
@@ -294,26 +365,76 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive design */
+/* Phase 2: Responsiveness */
 @media (max-width: 768px) {
   .dealmind-container {
-    padding: 10px;
+    padding: 16px;
   }
-  
+
+  .header-section {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+  }
+
   .app-title {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
-  
+
+  .app-subtitle {
+    font-size: 1rem;
+  }
+
+  .app-description,
+  .how-it-works {
+    padding: 14px 16px;
+  }
+
+  .category-section {
+    padding: 18px 16px;
+    margin: 24px 0;
+  }
+
   .checkbox-group {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
-  
+
+  .checkbox-item {
+    min-height: 48px;
+  }
+
+  .button-section {
+    margin: 24px 0;
+  }
+
+  .find-deals-btn {
+    width: 100%;
+    max-width: 320px;
+    padding: 14px 24px;
+  }
+
+  .results-table-wrapper {
+    max-height: 360px;
+    margin: 0 -4px;
+  }
+
   .results-table {
+    min-width: 560px;
     font-size: 14px;
   }
-  
+
   .results-table th,
   .results-table td {
-    padding: 8px;
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  .empty-results {
+    padding: 32px 16px;
+  }
+
+  .logs-container {
+    height: 320px;
+    font-size: 12px;
   }
 }

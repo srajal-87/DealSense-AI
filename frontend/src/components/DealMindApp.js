@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import CategorySection from './CategorySection';
+import ResultsTable from './ResultsTable';
+import LogsPanel from './LogsPanel';
 
 const DealMindApp = () => {
   // State management - mirrors Gradio state
@@ -20,7 +23,7 @@ const DealMindApp = () => {
   const pollIntervalRef = useRef(null);
   const pollTimeoutRef = useRef(null);
 
-  // Base API URL
+  // Base API URL. For production build, set REACT_APP_API_BASE to your deployed API (e.g. https://your-app.onrender.com).
   const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000';
 
   // Initialize - Load categories on component mount
@@ -259,16 +262,6 @@ const DealMindApp = () => {
   // Handle table row click (mirrors Gradio select)
   const handleRowClick = (index) => {
     console.log('Row clicked:', index);
-    // Add any row selection logic here if needed
-  };
-
-  // Format logs for display (mirrors Gradio HTML formatting)
-  const formatLogsForDisplay = () => {
-    return logs.map((log, index) => (
-      <div key={index} className={`log-entry ${log.level}`}>
-        <span dangerouslySetInnerHTML={{ __html: log.message }} />
-      </div>
-    ));
   };
 
   return (
@@ -296,31 +289,23 @@ const DealMindApp = () => {
       </div>
 
 
-      {/* Category Selection - mirrors Gradio CheckboxGroup */}
-      <div className="category-section">
-        <div className="section-title">🎯 Select up to 3 Deal Categories</div>
-        <div className="checkbox-group">
-          {categories.map((category) => (
-            <div key={category.name} className="checkbox-item">
-              <input
-                type="checkbox"
-                id={category.name}
-                checked={selectedCategories.includes(category.name)}
-                onChange={(e) => handleCategoryChange(category.name, e.target.checked)}
-                disabled={isSearching}
-              />
-              <label htmlFor={category.name}>{category.display_name}</label>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Category Selection */}
+      <CategorySection
+        categories={categories}
+        selectedCategories={selectedCategories}
+        isSearching={isSearching}
+        onCategoryChange={handleCategoryChange}
+      />
 
-      {/* Find Deals Button - mirrors Gradio Button */}
+      {/* Find Deals Button */}
       <div className="button-section">
-        <button 
-          className="find-deals-btn" 
+        <button
+          type="button"
+          className="find-deals-btn"
           onClick={handleFindDeals}
           disabled={isSearching}
+          aria-busy={isSearching}
+          aria-label={isSearching ? 'Searching for deals' : 'Find deals'}
         >
           {isSearching ? (
             <>
@@ -333,62 +318,27 @@ const DealMindApp = () => {
         </button>
       </div>
 
-      {/* Status Message */}
+      {/* Status Message - aria-live for screen readers */}
       {statusMessage && (
-        <div className={`status-message ${statusType}`}>
+        <div
+          className={`status-message ${statusType}`}
+          role="status"
+          aria-live={statusType === 'error' ? 'assertive' : 'polite'}
+          aria-atomic="true"
+        >
           {statusMessage}
         </div>
       )}
 
-      {/* Results Section - mirrors Gradio Dataframe */}
-      <div className="results-section">
-        <div className="section-title">📋 Best Deals Found</div>
-        {searchResults.length > 0 ? (
-          <table className="results-table">
-            <thead>
-              <tr>
-                <th style={{width: '50%'}}>Description</th>
-                <th style={{width: '12%'}}>Price</th>
-                <th style={{width: '12%'}}>AI Estimate</th>
-                <th style={{width: '12%'}}>Discount</th>
-                <th style={{width: '14%'}}>Link</th>
-              </tr>
-            </thead>
-            <tbody>
-              {searchResults.map((row, index) => (
-                <tr key={index} onClick={() => handleRowClick(index)}>
-                  <td>{row[0]}</td>
-                  <td>{row[1]}</td>
-                  <td>{row[2]}</td>
-                  <td>{row[3]}</td>
-                  <td dangerouslySetInnerHTML={{ __html: row[4] }}></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div className="empty-results">
-            {isSearching ? (
-              <div className="loading">
-                <span className="spinner"></span>
-                Searching for deals...
-              </div>
-            ) : (
-              'No deals found yet. Click "Find Deals" to start searching.'
-            )}
-          </div>
-        )}
-      </div>
+      {/* Results Section */}
+      <ResultsTable
+        searchResults={searchResults}
+        isSearching={isSearching}
+        onRowClick={handleRowClick}
+      />
 
-      {/* Live Agent Logs Section - mirrors Gradio HTML */}
-      <div className="logs-section">
-        <div className="section-title">📊 Live Agent Logs</div>
-        <div className="logs-container" ref={logsContainerRef}>
-          {logs.length > 0 ? formatLogsForDisplay() : (
-            <div className="log-entry">Waiting for logs...</div>
-          )}
-        </div>
-      </div>
+      {/* Live Agent Logs Section */}
+      <LogsPanel logs={logs} logsContainerRef={logsContainerRef} />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 """
-Pydantic schemas for FastAPI - matches Gradio data structures
+Pydantic schemas for FastAPI - 
 """
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field, validator
@@ -16,7 +16,7 @@ class CategoryRequest(BaseModel):
     
     @validator('selected_categories')
     def validate_categories(cls, v):
-        """Validate category selection - mirrors validate_categories() from Gradio"""
+        """Validate category selection"""
         if len(v) == 0:
             raise ValueError("Please select at least one category before running.")
         if len(v) > 3:
@@ -32,13 +32,13 @@ class DealData(BaseModel):
 
 
 class OpportunityData(BaseModel):
-    """Opportunity structure - mirrors the Opportunity class"""
+    """Opportunity structure """
     deal: DealData
     estimate: float
     discount: float
     
     def to_table_row(self) -> List[str]:
-        """Convert to table row format - mirrors table_for() from Gradio"""
+        """Convert to table row format """
         return [
             self.deal.product_description,
             f"${self.deal.price:.2f}",

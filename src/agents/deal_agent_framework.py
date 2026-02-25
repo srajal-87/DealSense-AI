@@ -69,7 +69,16 @@ class DealAgentFramework:
         return []
 
     def write_memory(self) -> None:
-        data = [opportunity.dict() for opportunity in self.memory]
+        # Ensure data directory exists (e.g. first run or fresh deploy)
+        data_dir = os.path.dirname(self.MEMORY_FILENAME)
+        if data_dir:
+            os.makedirs(data_dir, exist_ok=True)
+        # Pydantic v2: model_dump(); v1: dict()
+        def to_dict(opportunity):
+            if hasattr(opportunity, "model_dump"):
+                return opportunity.model_dump()
+            return opportunity.dict()
+        data = [to_dict(opportunity) for opportunity in self.memory]
         with open(self.MEMORY_FILENAME, "w") as file:
             json.dump(data, file, indent=2)
 

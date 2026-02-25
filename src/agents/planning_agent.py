@@ -1,3 +1,4 @@
+import os
 from typing import Optional, List
 from src.agents.agent import Agent
 from src.agents.deals import ScrapedDeal, DealSelection, Deal, Opportunity
@@ -5,11 +6,18 @@ from src.agents.scanner_agent import ScannerAgent
 from src.agents.ensemble_agent import EnsembleAgent
 
 
+def _deal_threshold() -> float:
+    """Minimum discount (dollars) to consider a deal; from env DEAL_THRESHOLD (default 50)."""
+    try:
+        return float(os.getenv("DEAL_THRESHOLD", "50"))
+    except ValueError:
+        return 50.0
+
+
 class PlanningAgent(Agent):
 
     name = "Planning Agent"
     color = Agent.GREEN
-    DEAL_THRESHOLD = 50
 
     def __init__(self, collection):
         """
@@ -18,7 +26,12 @@ class PlanningAgent(Agent):
         self.log("Planning Agent is initializing")
         self.scanner = ScannerAgent()
         self.ensemble = EnsembleAgent(collection)
+        self._threshold = _deal_threshold()
         self.log("Planning Agent is ready")
+
+    @property
+    def DEAL_THRESHOLD(self) -> float:
+        return self._threshold
 
     def run(self, deal: Deal) -> Opportunity:
         """
@@ -50,7 +63,7 @@ class PlanningAgent(Agent):
             opportunities.sort(key=lambda opp: opp.discount, reverse=True)
 
             # Filter deals above threshold and take up to 3
-            above_threshold = [opp for opp in opportunities if opp.discount > self.DEAL_THRESHOLD]
+            above_threshold = [opp for opp in opportunities if opp.discount > self._threshold]
 
             if above_threshold:
                 deals_to_return = above_threshold[:3]

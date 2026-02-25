@@ -3,10 +3,14 @@ from typing import List, Dict, Self
 from bs4 import BeautifulSoup
 from src.config.feeds import CATEGORY_FEEDS
 import re
+import logging
 import feedparser
 from tqdm import tqdm
 import requests
 import time
+
+# Timeout for fetching a single deal page (seconds)
+DEAL_PAGE_TIMEOUT = 15
 
 def extract(html_snippet: str) -> str:
     """
@@ -37,17 +41,30 @@ class ScrapedDeal:
 
     def __init__(self, entry: Dict[str, str]):
         """
-        Populate this instance based on the provided dict
+        Populate this instance based on the provided dict.
+        Uses timeout on request; safe fallback if content-section is missing.
         """
-        self.title = entry['title']
-        self.summary = extract(entry['summary'])
-        self.url = entry['links'][0]['href']
-        stuff = requests.get(self.url).content
-        soup = BeautifulSoup(stuff, 'html.parser')
-        content = soup.find('div', class_='content-section').get_text()
-        content = content.replace('\nmore', '').replace('\n', ' ')
+        self.title = entry.get("title", "")
+        self.summary = extract(entry.get("summary", ""))
+        self.url = entry["links"][0]["href"]
+        try:
+            resp = requests.get(self.url, timeout=DEAL_PAGE_TIMEOUT)
+            resp.raise_for_status()
+            stuff = resp.content
+        except requests.RequestException as e:
+            logging.warning("Failed to fetch deal page %s: %s", self.url, e)
+            self.details = self.summary
+            self.features = ""
+            return
+        soup = BeautifulSoup(stuff, "html.parser")
+        content_div = soup.find("div", class_="content-section")
+        if content_div is None:
+            content = self.summary
+        else:
+            content = content_div.get_text(separator=" ", strip=True)
+        content = content.replace("\nmore", "").replace("\n", " ")
         if "Features" in content:
-            self.details, self.features = content.split("Features")
+            self.details, self.features = content.split("Features", 1)
         else:
             self.details = content
             self.features = ""
@@ -69,6 +86,7 @@ class ScrapedDeal:
         """
         Retrieve all deals from the selected RSS feeds.
         If selected_feeds is None, fall back to all feeds in CATEGORY_FEEDS.
+        Skips entries that fail to parse so one bad URL does not break the whole fetch.
         """
         deals = []
         feed_list = selected_feeds if selected_feeds else [list(CATEGORY_FEEDS.values())[0]]
@@ -77,7 +95,10 @@ class ScrapedDeal:
         for feed_url in feed_iter:
             feed = feedparser.parse(feed_url)
             for entry in feed.entries[:5]:
-                deals.append(cls(entry))
+                try:
+                    deals.append(cls(entry))
+                except Exception as e:
+                    logging.warning("Skipping deal entry due to error: %s", e)
                 time.sleep(0.5)
         return deals
 

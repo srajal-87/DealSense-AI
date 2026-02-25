@@ -1,19 +1,15 @@
-"""
-Deal routes - Direct replacement for Gradio button clicks and data operations
-"""
+""" Deal routes """
 import asyncio
 import logging
 import uuid
 from typing import List, Dict, Any
-from datetime import datetime
-import threading
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
-from fastapi.responses import JSONResponse
 
 from api.models.schemas import (
-    CategoryRequest, SearchResponse, SearchResultsResponse, 
-    AppStatus, ErrorResponse, OpportunityData
+    CategoryRequest, SearchResponse, SearchResultsResponse,
+    AppStatus,
 )
 from src.config.feeds import CATEGORY_FEEDS
 
@@ -22,10 +18,39 @@ router = APIRouter()
 # Global state for managing background tasks
 active_jobs: Dict[str, Dict[str, Any]] = {}
 
+# Cap total jobs in memory; prune oldest completed/error/cancelled when at limit
+MAX_ACTIVE_JOBS = 200
+# Drop jobs older than this when pruning (only completed/error/cancelled)
+JOB_MAX_AGE_HOURS = 1
+
+
+def _prune_old_jobs() -> None:
+    """Remove oldest completed/error/cancelled jobs when over cap or older than JOB_MAX_AGE_HOURS."""
+    if not active_jobs:
+        return
+    finished_statuses = {"completed", "error", "cancelled"}
+    # Build list of (job_id, created_at) for finished jobs, sort by created_at ascending
+    to_remove = [
+        (jid, job["created_at"])
+        for jid, job in active_jobs.items()
+        if job["status"] in finished_statuses
+    ]
+    to_remove.sort(key=lambda x: x[1])
+    cutoff = datetime.now() - timedelta(hours=JOB_MAX_AGE_HOURS)
+    removed = 0
+    for job_id, created_at in to_remove:
+        if len(active_jobs) <= MAX_ACTIVE_JOBS and created_at > cutoff:
+            break
+        if job_id in active_jobs:
+            del active_jobs[job_id]
+            removed += 1
+    if removed:
+        logging.info("Pruned %d old job(s) from active_jobs", removed)
+
 
 def table_for(opps) -> List[List[str]]:
     """
-    Format opportunities for table display - Direct from Gradio app.py
+    Format opportunities for table display
     """
     return [
         [
@@ -41,7 +66,7 @@ def table_for(opps) -> List[List[str]]:
 
 def validate_categories_logic(selected_categories: List[str]) -> str:
     """
-    Validate category selection - Direct from Gradio app.py
+    Validate category selection 
     """
     if len(selected_categories) == 0:
         return "⚠️ Please select at least one category before running."
@@ -94,7 +119,7 @@ async def run_deal_search_background(job_id: str, selected_categories: List[str]
 @router.get("/categories")
 async def get_categories():
     """
-    Get available categories - Direct replacement for Gradio CheckboxGroup choices
+    Get available categories
     """
     try:
         categories = [
@@ -114,7 +139,7 @@ async def start_deal_search(
     fastapi_request: Request
 ):
     """
-    Start deal search - Direct replacement for Gradio button click
+    Start deal search 
     """
     try:
         # Validate categories (same logic as Gradio)
@@ -122,9 +147,16 @@ async def start_deal_search(
         if validation_error:
             raise HTTPException(status_code=400, detail=validation_error)
         
+        _prune_old_jobs()
+        if len(active_jobs) >= MAX_ACTIVE_JOBS:
+            raise HTTPException(
+                status_code=503,
+                detail="Too many jobs in progress; try again shortly.",
+            )
+
         # Generate job ID
         job_id = str(uuid.uuid4())
-        
+
         # Initialize job tracking
         active_jobs[job_id] = {
             "status": "initializing",
@@ -158,7 +190,7 @@ async def start_deal_search(
 @router.get("/results/{job_id}", response_model=SearchResultsResponse)
 async def get_search_results(job_id: str):
     """
-    Get search results - Direct replacement for Gradio table display
+    Get search results 
     """
     try:
         if job_id not in active_jobs:
@@ -183,7 +215,7 @@ async def get_search_results(job_id: str):
 @router.get("/status")
 async def get_app_status(request: Request):
     """
-    Get application status - New endpoint for React frontend
+    Get application status
     """
     try:
         deal_framework = request.app.state.get_deal_framework()

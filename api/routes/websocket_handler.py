@@ -1,6 +1,4 @@
-"""
-WebSocket handler - Direct replacement for Gradio real-time logs
-"""
+""" WebSocket handler """
 import asyncio
 import json
 import logging
@@ -159,7 +157,7 @@ manager = ConnectionManager()
 @router.websocket("/logs")
 async def websocket_logs_endpoint(websocket: WebSocket):
     """
-    WebSocket endpoint for real-time logs - Direct replacement for Gradio HTML logs
+    WebSocket endpoint for real-time logs
     """
     await manager.connect(websocket)
     
