@@ -4,7 +4,7 @@ ipykernel
 feedparser
 tqdm
 bs4
-pydantic
+pydantic>=1.10,<2.12
 openai
 dotenv
 huggingface_hub 
