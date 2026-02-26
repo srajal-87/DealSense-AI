@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import CategorySection from './CategorySection';
 import ResultsTable from './ResultsTable';
@@ -13,8 +13,7 @@ const DealMindApp = () => {
   const [statusType, setStatusType] = useState(''); // 'error', 'success', 'warning'
   const [searchResults, setSearchResults] = useState([]);
   const [logs, setLogs] = useState([]);
-  const [currentJobId, setCurrentJobId] = useState(null);
-  
+
   // WebSocket connection
   const wsRef = useRef(null);
   const logsContainerRef = useRef(null);
@@ -26,19 +25,68 @@ const DealMindApp = () => {
   // Base API URL. For production build, set REACT_APP_API_BASE to your deployed API (e.g. https://your-app.onrender.com).
   const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000';
 
-  // Initialize - Load categories on component mount
+  const addLog = useCallback((message, level = 'info') => {
+    const timestamp = new Date().toLocaleTimeString();
+    const formattedMessage = `[${timestamp}] ${message}`;
+    setLogs((prevLogs) => [...prevLogs.slice(-49), { message: formattedMessage, level }]);
+  }, []);
+
+  const loadCategories = useCallback(async () => {
+    try {
+      const response = await axios.get(`${API_BASE}/api/categories`);
+      setCategories(response.data.categories);
+    } catch (error) {
+      console.error('Error loading categories:', error);
+      setStatusMessage('Error loading categories');
+      setStatusType('error');
+    }
+  }, [API_BASE]);
+
+  const setupWebSocket = useCallback(() => {
+    const wsUrl = `${API_BASE.replace('http', 'ws')}/ws/logs`;
+    wsRef.current = new WebSocket(wsUrl);
+
+    wsRef.current.onopen = () => {
+      console.log('WebSocket connected');
+      addLog('Connected to DealMind AI logs', 'info');
+    };
+
+    wsRef.current.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === 'log') {
+          addLog(message.data.formatted_message, (message.data.level || 'info').toLowerCase());
+        } else if (message.type === 'status') {
+          console.log('Status update:', message.data);
+        }
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
+      }
+    };
+
+    wsRef.current.onclose = () => {
+      console.log('WebSocket disconnected');
+      addLog('Disconnected from logs', 'warning');
+    };
+
+    wsRef.current.onerror = () => {
+      console.error('WebSocket error');
+      addLog('WebSocket connection error', 'error');
+    };
+  }, [API_BASE, addLog]);
+
+  // Initialize - Load categories and WebSocket on component mount
   useEffect(() => {
     loadCategories();
     setupWebSocket();
-    
+
     return () => {
-      // CLEANUP - Prevent memory leaks
       cleanupPolling();
       if (wsRef.current) {
         wsRef.current.close();
       }
     };
-  }, []);
+  }, [loadCategories, setupWebSocket]);
 
   // Auto-scroll logs to bottom
   useEffect(() => {
@@ -57,64 +105,6 @@ const DealMindApp = () => {
       clearTimeout(pollTimeoutRef.current);
       pollTimeoutRef.current = null;
     }
-  };
-
-  // Load available categories from API
-  const loadCategories = async () => {
-    try {
-      const response = await axios.get(`${API_BASE}/api/categories`);
-      setCategories(response.data.categories);
-    } catch (error) {
-      console.error('Error loading categories:', error);
-      setStatusMessage('Error loading categories');
-      setStatusType('error');
-    }
-  };
-
-  // Setup WebSocket connection for real-time logs
-  const setupWebSocket = () => {
-    const wsUrl = `${API_BASE.replace('http', 'ws')}/ws/logs`;
-    wsRef.current = new WebSocket(wsUrl);
-    
-    wsRef.current.onopen = () => {
-      console.log('WebSocket connected');
-      addLog('Connected to DealMind AI logs', 'info');
-    };
-    
-    wsRef.current.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-        if (message.type === 'log') {
-          addLog(message.data.formatted_message, message.data.level.toLowerCase());
-        } else if (message.type === 'status') {
-          console.log('Status update:', message.data);
-        }
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-      }
-    };
-    
-    wsRef.current.onclose = () => {
-      console.log('WebSocket disconnected');
-      addLog('Disconnected from logs', 'warning');
-    };
-    
-    wsRef.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      addLog('WebSocket connection error', 'error');
-    };
-  };
-
-  // Add log entry (mirrors Gradio log display)
-  const addLog = (message, level = 'info') => {
-    const timestamp = new Date().toLocaleTimeString();
-    const formattedMessage = `[${timestamp}] ${message}`;
-    
-    setLogs(prevLogs => {
-      const newLogs = [...prevLogs, { message: formattedMessage, level }];
-      // Keep only last 50 logs to prevent memory issues
-      return newLogs.slice(-50);
-    });
   };
 
   // Handle category selection
@@ -174,8 +164,7 @@ const DealMindApp = () => {
       });
       
       const jobId = response.data.job_id;
-      setCurrentJobId(jobId);
-      
+
       setStatusMessage('Search in progress... Please wait');
       setStatusType('success');
       
