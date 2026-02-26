@@ -218,7 +218,7 @@ body {
   border: 1px solid rgba(234, 179, 8, 0.4);
 }
 
-/* Results Table - matching Gradio Dataframe */
+/* Results Table - fixed layout, aligned columns */
 .results-section {
   margin: 28px 0;
 }
@@ -235,9 +235,15 @@ body {
 .results-table {
   width: 100%;
   min-width: 640px;
+  table-layout: fixed;
   border-collapse: collapse;
   background-color: #1a1f2e;
 }
+
+/* Fixed column widths for consistent alignment */
+.results-table .col-desc { width: 42%; }
+.results-table .col-num { width: 12%; }
+.results-table .col-link { width: 16%; }
 
 .results-table thead {
   background-color: #252d3d;
@@ -247,12 +253,20 @@ body {
 }
 
 .results-table th {
-  padding: 14px 12px;
-  text-align: left;
+  padding: 12px 10px;
   color: #f1f5f9;
   font-weight: 600;
   font-size: 0.875rem;
   border-bottom: 2px solid #334155;
+}
+
+.results-table th.col-desc {
+  text-align: left;
+}
+
+.results-table th.col-num,
+.results-table th.col-link {
+  text-align: center;
 }
 
 .results-table tbody {
@@ -261,11 +275,70 @@ body {
 }
 
 .results-table td {
-  padding: 14px 12px;
+  padding: 12px 10px;
   border-bottom: 1px solid #334155;
   color: #e2e8f0;
   font-size: 0.9375rem;
-  vertical-align: top;
+  vertical-align: middle;
+}
+
+.results-table td.col-desc {
+  text-align: left;
+  max-width: 0; /* allows column to respect width with text wrapping */
+}
+
+.results-table td.col-num,
+.results-table td.col-link {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.results-table td.col-link {
+  vertical-align: middle;
+}
+
+.results-table td.col-link > a {
+  display: inline-block;
+}
+
+/* Description cell: 3-line clamp with optional expand */
+.deal-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.4;
+  max-height: calc(1.4em * 3);
+}
+
+.deal-description.expanded {
+  -webkit-line-clamp: unset;
+  max-height: none;
+  overflow: visible;
+}
+
+.read-more-btn {
+  margin-top: 6px;
+  padding: 4px 10px;
+  font-size: 0.8125rem;
+  color: #3b82f6;
+  background: transparent;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.read-more-btn:hover {
+  color: #60a5fa;
+  border-color: #3b82f6;
+}
+
+.read-more-btn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 .results-table tbody tr:hover {
